@@ -1,0 +1,13 @@
+---
+- name: Reboot the Raspberries
+  hosts: all
+  roles: 
+    - common
+  become: yes
+  
+  tasks:
+  
+  - name: Rebooting...
+    reboot:
+      msg: "Reboot initiated by Ansible"
+      test_command: uptime
