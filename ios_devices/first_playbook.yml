@@ -1,0 +1,23 @@
+---
+## Playbook for reading and saving the running config of IOS devices using legacy CLI commands
+
+- hosts: all
+  gather_facts: false
+  roles:
+  - common
+
+  tasks:
+
+    - name: Collect device configuration
+      cisco.ios.ios_facts:
+        gather_subset: all
+      register: current_config
+
+    - name: Print device identity info
+      debug:
+        msg: "{{ current_config.ansible_facts.ansible_net_hostname }} is reachable and the OS is {{ current_config.ansible_facts.ansible_net_version }}. SN is {{ current_config.ansible_facts.ansible_net_serialnum }}. Model is {{current_config.ansible_facts.ansible_net_model }}"
+
+
+
+
+    
