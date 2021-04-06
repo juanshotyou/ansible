@@ -10,6 +10,15 @@
   - name: Update package repositories
     apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
 
+  - name: Get the list of upgradable packages
+    apt: upgrade=dist
+    check_mode: yes
+    register: upgradable_packages
+
+  - name: Print uptime information
+    debug: 
+      var: upgradable_packages.stdout_lines
+
   - name: Upgrade packages on targets
     apt: upgrade=dist force_apt_get=yes 
 
