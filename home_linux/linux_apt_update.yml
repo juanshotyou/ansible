@@ -15,7 +15,7 @@
     check_mode: yes
     register: upgradable_packages
 
-  - name: Print uptime information
+  - name: Print list of upgradable packages 
     debug: 
       var: upgradable_packages.stdout_lines
 
