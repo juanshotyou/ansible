@@ -1,0 +1,16 @@
+---
+- name: Get the status of the RPI servers
+  hosts: all
+  roles: 
+    - common
+  become: yes
+  
+  tasks:
+  
+  - name: Get device information
+    command: bash /home/vlad/status.sh
+    register: status
+
+  - name: Print device information
+    debug:
+      var: status.stdout_lines
