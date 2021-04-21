@@ -1,0 +1,14 @@
+---
+
+- name: Test playbook - reads and prints device info
+  hosts: baguleykit
+  gather_facts: false
+  connection: network_cli
+  roles:
+  - common
+
+  tasks:
+
+    - name: Run one command on device
+      cisco.ios.ios_command:
+        commands: show version

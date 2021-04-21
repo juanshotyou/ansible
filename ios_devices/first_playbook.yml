@@ -1,15 +1,17 @@
 ---
-## Playbook for reading and saving the running config of IOS devices using legacy CLI commands
+## Playbook for reading and printing device information
 
-- hosts: all
+- name: First playbook - reads and prints device info
+  hosts: homekit
   gather_facts: false
+  connection: network_cli
   roles:
   - common
 
   tasks:
 
     - name: Collect device configuration
-      cisco.ios.ios_facts:
+      ios_facts:
         gather_subset: all
       register: current_config
 
