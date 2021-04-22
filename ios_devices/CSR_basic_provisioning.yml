@@ -1,0 +1,106 @@
+---
+## This playbook configures essential features on IOS-XE for a new router (CSR in this case) 
+## The only requirement is a working SSH connection to the device
+
+- name: Configure essential features on IOS-XE device
+  hosts: homekit
+  gather_facts: false
+  connection: network_cli
+  roles:
+  - common
+
+  tasks:
+
+    #Collect current device information 
+
+    - name: Collect device facts
+      ios_facts:
+        gather_subset: all
+      register: current_config
+
+    - name: Configuring login banner
+      ios_banner:
+        banner: login
+        text: |
+          |--------------------------------------------------------------------------|
+          |                     I M P O R T A N T   N O T I C E                      |
+          |Unauthorised use of this computer system may lead to criminal prosecution.|
+          |If you are not an authorised user, disconnect immediately.                |
+          |Your use of this system may be monitored and/or recorded.                 |
+          |By accessing and using this system you consent to such monitoring for     |
+          |law enforcement and other purposes.                                       |
+          |--------------------------------------------------------------------------|
+        state: present
+
+    - name: Configuring exec banner
+      ios_banner:
+        banner: exec
+        text: |
+          |--------------------------------------------------------------------------|
+          |This device is managed, supported and it's configuration owned by the     |
+          |Virgin Media Business Data Services team in England                       |
+          |--------------------------------------------------------------------------|
+        state: present
+
+    - name: Configuring MOTD banner
+      ios_banner:
+        banner: motd
+        text: |
+          
+          Welcome!
+
+        state: present
+
+    - name: Configuring NTP servers
+      ios_ntp:
+        server: 1.uk.pool.ntp.org	
+        logging: yes
+        state: present
+
+    - name: Configuring logging levels
+      ios_logging:
+        aggregate: 
+        - {dest: buffered, level: notifications, size: 10000}
+        - {dest: console, level: debugging}
+        state: present
+
+    - name: Configuring hostname and domain settings
+      ios_system:
+        hostname: ThinkPad-CSRv
+        domain_name: ThinkPad-CSRv.vladlab.local
+        lookup_enabled: no
+        name_servers:
+        - 192.168.1.1
+        - 8.8.8.8
+
+    - name: Configuring user account for automation jobs
+      ios_user:
+        name: ansible_user
+        hashed_password:
+          type: 9
+          value: $9$CvE4F0G0ZTgz7E$Gj2TQ4HJasemYExfmYnAyJQzkGvLVqlGtcfWt3ZfVcI
+        privilege: 15
+        state: present
+
+    - name: Configuring system settings and commit changes to startup-config
+      ios_config:
+        lines:
+        - service timestamps debug datetime msec localtime show-timezone
+        - service timestamps log datetime msec localtime show-timezone
+        - service tcp-keepalives-in
+        - clock timezone GMT 0 0
+        - clock summer-time BST recurring last Sun Mar 1:00 last Sun Oct 2:00
+        - aaa new-model
+        - aaa authentication login default local
+        - aaa authentication enable default enable
+        - aaa authorization config-commands
+        - aaa authorization exec default local
+        - aaa authorization commands 0 default local
+        - aaa authorization commands 15 default local
+        - aaa accounting exec default start-stop logger
+        - aaa accounting commands 0 default start-stop logger
+        - aaa accounting commands 1 default start-stop logger
+        - aaa accounting commands 15 default start-stop logger
+        - aaa accounting system default start-stop logger
+        - aaa session-id common
+        save_when: modified
