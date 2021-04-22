@@ -1,5 +1,5 @@
 ---
-## This playbook backs up the device configuration
+## This playbook backs up the device configuration to a specific folder and tags it with timestamps
 
 - name: Backup device configuration with timestamps
   hosts: homekit
@@ -10,10 +10,14 @@
 
   tasks:
 
+    #Collect device information in order to use the hostname in the backup file name
+
     - name: Collect device facts
       ios_facts:
         gather_subset: all
       register: current_config
+
+    #Perform the backup and save it to a specific folder - in this case the path is set to be outside the GIT repository (for security purposes)
 
     - name: Save configuration and back it up to local folder
       ios_config:
