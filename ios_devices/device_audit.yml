@@ -1,7 +1,7 @@
 ---
-## Playbook for reading and printing device information
+## This playbook collects the device facts and prints out key information
 
-- name: First playbook - reads and prints device info
+- name: Audit devices and print key information
   hosts: homekit
   gather_facts: false
   connection: network_cli
@@ -18,6 +18,38 @@
     - name: Print device identity info
       debug:
         msg: "{{ current_config.ansible_facts.ansible_net_hostname }} is reachable and the OS is {{ current_config.ansible_facts.ansible_net_version }}. SN is {{ current_config.ansible_facts.ansible_net_serialnum }}. Model is {{current_config.ansible_facts.ansible_net_model }}"
+
+    - name: Collect interface, routing and IOX runtime information
+      ios_command:
+        commands:
+          - show ip interface brief
+          - show interface description
+          - show ip route
+          - show ip arp
+          - show iox
+      register: runtime_information
+
+
+    - name: Print interface information
+      debug:
+        var: runtime_information.stdout_lines[0]
+
+    - name: Print interface description
+      debug:
+        var: runtime_information.stdout_lines[1]
+
+    - name: Print routing information
+      debug:
+        var: runtime_information.stdout_lines[2]
+
+    - name: Print ARP information
+      debug:
+        var: runtime_information.stdout_lines[3]
+
+    - name: Print IOx information
+      debug:
+        var: runtime_information.stdout_lines[4]
+
 
 
 

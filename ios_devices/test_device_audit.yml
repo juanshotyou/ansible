@@ -1,0 +1,29 @@
+---
+## Playbook for reading and printing device information
+
+- name: Collect device facts and print formatted and unformatted information
+  hosts: homekit
+  gather_facts: false
+  connection: network_cli
+  roles:
+  - common
+
+  tasks:
+
+    - name: Collect device configuration
+      ios_facts:
+        gather_subset: all
+      register: current_config
+
+    - name: Print device identity info
+      debug:
+        msg: "{{ current_config.ansible_facts.ansible_net_hostname }} is reachable and the OS is {{ current_config.ansible_facts.ansible_net_version }}. SN is {{ current_config.ansible_facts.ansible_net_serialnum }}. Model is {{current_config.ansible_facts.ansible_net_model }}"
+
+    - name: Print contents of current_config object
+      debug:
+        var: current_config
+
+
+
+
+    

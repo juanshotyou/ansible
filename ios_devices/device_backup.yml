@@ -1,0 +1,24 @@
+---
+## This playbook backs up the device configuration
+
+- name: Backup device configuration with timestamps
+  hosts: homekit
+  gather_facts: false
+  connection: network_cli
+  roles:
+  - common
+
+  tasks:
+
+    - name: Collect device facts
+      ios_facts:
+        gather_subset: all
+      register: current_config
+
+    - name: Save configuration and back it up to local folder
+      ios_config:
+        backup: yes
+        backup_options:
+          dir_path: ../../ansible_backups/
+          filename: "{{ current_config.ansible_facts.ansible_net_hostname }}-{{ '%Y-%m-%d' | strftime }}-{{ '%H:%M:%S' | strftime }}.backup"
+      
