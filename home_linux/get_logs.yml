@@ -1,0 +1,21 @@
+---
+- name: Copy the contents of the "/var/log" folder to the Ansible controller
+  hosts: all
+  roles:
+    - common
+  become: yes
+
+  tasks:
+
+  - name: Generate the list of files to be copied
+    shell: "cd /var/log; find . -maxdepth 1 -type f | cut -d'/' -f2"
+    register: files_to_copy
+
+  - name: Copy the log files
+    fetch:
+      src: /var/log/{{ item }}
+      dest: /mnt/c/Ansible/fetched_logs
+    with_items: "{{ files_to_copy.stdout_lines }}"
+
+
+
